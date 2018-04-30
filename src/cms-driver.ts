@@ -38,12 +38,12 @@ export class CMakeServerClientDriver extends CMakeDriver {
 
   private _codeModel: null|cms.CodeModelContent;
   get codeModel(): null|cms.CodeModelContent { return this._codeModel; }
-  set codeModel(v: null|cms.CodeModelContent) {
+  async setCodeModel(v: null|cms.CodeModelContent) {
     this._codeModel = v;
     if (v && v.configurations.length && v.configurations[0].projects.length) {
-      this.doSetProjectName(v.configurations[0].projects[0].name);
+      await this.doSetProjectName(v.configurations[0].projects[0].name);
     } else {
-      this.doSetProjectName('No project');
+      await this.doSetProjectName('No project');
     }
   }
 
@@ -132,7 +132,7 @@ export class CMakeServerClientDriver extends CMakeDriver {
               new cache.Entry(el.key, el.value, type, el.properties.HELPSTRING, el.properties.ADVANCED === '1'));
       return acc;
     }, new Map<string, cache.Entry>());
-    this.codeModel = await cl.sendRequest('codemodel');
+    await this.setCodeModel(await cl.sendRequest('codemodel'));
   }
 
   async doRefreshExpansions(cb: () => Promise<void>): Promise<void> {

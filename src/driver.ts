@@ -116,8 +116,8 @@ export abstract class CMakeDriver implements vscode.Disposable {
   private readonly _projectNameChangedEmitter = new vscode.EventEmitter<string>();
 
   public get projectName(): string { return this.ws.state.projectName || 'Unknown Project'; }
-  protected doSetProjectName(v: string) {
-    this.ws.state.projectName = v;
+  protected async doSetProjectName(v: string) {
+    await this.ws.state.setProjectName(v);
     this._projectNameChangedEmitter.fire(v);
   }
 
@@ -511,9 +511,9 @@ export abstract class CMakeDriver implements vscode.Disposable {
         return gen;
       }
     }
-    vscode.window.showErrorMessage(
-        `Unable to determine what CMake generator to use.
-Please install or configure a preferred generator, or update settings.json or your Kit configuration.`);
+    rollbar.takePromise(
+        vscode.window.showErrorMessage(`Unable to determine what CMake generator to use.
+Please install or configure a preferred generator, or update settings.json or your Kit configuration.`));
     return null;
   }
 
@@ -627,18 +627,20 @@ Please install or configure a preferred generator, or update settings.json or yo
     if (this._isBusy) {
       if (this.ws.config.autoRestartBuild) {
         log.debug('Stopping current CMake task.');
-        vscode.window.showInformationMessage('Stopping current CMake task and starting new build.');
+        rollbar.takePromise(
+            vscode.window.showInformationMessage('Stopping current CMake task and starting new build.'));
         await this.stopCurrentProcess();
       } else {
         log.debug('No configuring: We\'re busy.');
-        vscode.window.showErrorMessage('A CMake task is already running. Stop it before trying to configure.');
+        rollbar.takePromise(
+            vscode.window.showErrorMessage('A CMake task is already running. Stop it before trying to configure.'));
         return false;
       }
     }
 
     if (!this.sourceDir) {
       log.debug('No configuring: There is no source directory.');
-      vscode.window.showErrorMessage('You do not have a source directory open');
+      rollbar.takePromise(vscode.window.showErrorMessage('You do not have a source directory open'));
       return false;
     }
 
@@ -648,7 +650,7 @@ Please install or configure a preferred generator, or update settings.json or yo
       const do_quickstart
           = await vscode.window.showErrorMessage('You do not have a CMakeLists.txt', 'Quickstart a new CMake project');
       if (do_quickstart)
-        vscode.commands.executeCommand('cmake.quickStart');
+        rollbar.takePromise(vscode.commands.executeCommand('cmake.quickStart'));
       return false;
     }
 
@@ -688,11 +690,8 @@ Please install or configure a preferred generator, or update settings.json or yo
         util.objectPairs(util.mergeEnvironment(this.ws.config.buildEnvironment, await this.getExpandedEnvironment()))
             .forEach(async ([key, value]) => build_env[key] = await expand.expandString(value, opts)));
 
-    const args =
-        ['--build', this.binaryDir, '--config', this.currentBuildType, '--target', target].concat(this.ws.config.buildArgs,
-                                                                                                  ['--'],
-                                                                                                  generator_args,
-                                                                                                  this.ws.config.buildToolArgs);
+    const args = ['--build', this.binaryDir, '--config', this.currentBuildType, '--target', target]
+                     .concat(this.ws.config.buildArgs, ['--'], generator_args, this.ws.config.buildToolArgs);
     const expanded_args_promises
         = args.map(async (value: string) => expand.expandString(value, {...opts, envOverride: build_env}));
     const expanded_args = await Promise.all(expanded_args_promises);

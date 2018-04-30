@@ -32,7 +32,8 @@ let INSTANCE: CMakeTools|null = null;
 export async function activate(context: vscode.ExtensionContext): Promise<CMakeTools> {
   // Create a WorkspaceContext for the current workspace. In the future, this will
   // instantiate for each directory in a workspace
-  const ws = DirectoryContext.createForDirectory(vscode.workspace.rootPath!, new StateManager(context));
+  const ws
+      = DirectoryContext.createForDirectory(vscode.workspace.rootPath!, new StateManager(context, '__unspecified__'));
   // Create a new instance and initailize.
   const cmt_pr = CMakeTools.create(context, ws);
 

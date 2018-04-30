@@ -123,7 +123,7 @@ export class LegacyCMakeDriver extends CMakeDriver {
     this._cmakeCache = new_cache;
     const project = new_cache.get('CMAKE_PROJECT_NAME');
     if (project) {
-      this.doSetProjectName(project.as<string>());
+      await this.doSetProjectName(project.as<string>());
     }
     this._compilationDatabase = CompilationDatabase.fromFilePath(path.join(this.binaryDir, 'compile_commands.json'));
   }

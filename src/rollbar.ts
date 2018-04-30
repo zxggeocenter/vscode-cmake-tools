@@ -87,7 +87,7 @@ class RollbarController {
         log.trace('User did not answer. Rollbar is not enabled.');
         return;
       }
-      extensionContext.globalState.update(key, !item.isCloseAffordance);
+      await extensionContext.globalState.update(key, !item.isCloseAffordance);
       this._enabled = !item.isCloseAffordance;
     }
     log.debug('Rollbar enabled? ', this._enabled);
@@ -178,11 +178,26 @@ class RollbarController {
     }
   }
 
-  takePromise<T>(what: string, additional: object, pr: Promise<T>): void {
-    pr.catch(e => {
-      this.exception('Unhandled Promise rejection: ' + what, e, additional);
-      throw e;
-    });
+  takePromise<T>(pr: Thenable<T>): void;
+  takePromise<T>(what: string, pr: Thenable<T>): void;
+  takePromise<T>(what: string, additional: object, pr: Thenable<T>): void;
+  takePromise<T>(arg1: string|Thenable<T>, arg2?: object|Thenable<T>, arg3?: Thenable<T>): void {
+    if (arg3) {
+      const what = arg1 as string;
+      const additional = arg2 as object;
+      const pr = arg3;
+      pr.then(() => {}, e => { this.exception('Unhandled Promise rejection: ' + what, e, additional); });
+    } else if (arg2) {
+      const what = arg1 as string;
+      const pr = arg2 as Thenable<T>;
+      pr.then(() => {}, e => { this.exception('Unhandled Promise rejection: ' + what, e); });
+    } else {
+      const pr = arg1 as Thenable<T>;
+      pr.then(() => {}, e => {
+        this.exception('Unhandled Promise rejection: <unnamed-promise>', e);
+        throw e;
+      });
+    }
   }
 }
 

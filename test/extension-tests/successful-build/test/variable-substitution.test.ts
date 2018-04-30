@@ -34,7 +34,7 @@ suite('[Variable Substitution]', async () => {
 
   test('Check substitution for "workspaceRoot"', async () => {
     // Set fake settings
-    testEnv.setting.changeSetting('configureSettings', {workspaceRoot: '${workspaceRoot}'});
+    await testEnv.setting.changeSetting('configureSettings', {workspaceRoot: '${workspaceRoot}'});
 
     // Configure
     expect(await cmt.configure()).to.be.eq(0, '[workspaceRoot] configure failed');
@@ -51,7 +51,7 @@ suite('[Variable Substitution]', async () => {
 
   test('Check substitution for "workspaceFolder"', async () => {
     // Set fake settings
-    testEnv.setting.changeSetting('configureSettings', {workspaceFolder: '${workspaceFolder}'});
+    await testEnv.setting.changeSetting('configureSettings', {workspaceFolder: '${workspaceFolder}'});
 
     // Configure
     expect(await cmt.configure()).to.be.eq(0, '[workspaceFolder] configure failed');
@@ -68,7 +68,7 @@ suite('[Variable Substitution]', async () => {
 
   test('Check substitution for "buildType"', async () => {
     // Set fake settings
-    testEnv.setting.changeSetting('configureSettings', {buildType: '${buildType}'});
+    await testEnv.setting.changeSetting('configureSettings', {buildType: '${buildType}'});
 
     // Configure
     expect(await cmt.configure()).to.be.eq(0, '[buildType] configure failed');
@@ -84,7 +84,7 @@ suite('[Variable Substitution]', async () => {
 
   test('Check substitution for "workspaceRootFolderName"', async () => {
     // Set fake settings
-    testEnv.setting.changeSetting('configureSettings', {workspaceRootFolderName: '${workspaceRootFolderName}'});
+    await testEnv.setting.changeSetting('configureSettings', {workspaceRootFolderName: '${workspaceRootFolderName}'});
 
     // Configure
     expect(await cmt.configure()).to.be.eq(0, '[workspaceRootFolderName] configure failed');
@@ -102,7 +102,7 @@ suite('[Variable Substitution]', async () => {
 
   test('Check substitution for "generator"', async () => {
     // Set fake settings
-    testEnv.setting.changeSetting('configureSettings', {generator: '${generator}'});
+    await testEnv.setting.changeSetting('configureSettings', {generator: '${generator}'});
 
     // Configure
     expect(await cmt.configure()).to.be.eq(0, '[generator] configure failed');
@@ -119,7 +119,7 @@ suite('[Variable Substitution]', async () => {
 
   test('Check substitution for "projectName"', async () => {
     // Set fake settings
-    testEnv.setting.changeSetting('configureSettings', {projectName: '${projectName}'});
+    await testEnv.setting.changeSetting('configureSettings', {projectName: '${projectName}'});
 
     // Configure
     expect(await cmt.configure()).to.be.eq(0, '[projectName] configure failed');
@@ -135,7 +135,7 @@ suite('[Variable Substitution]', async () => {
 
   test('Check substitution for "userHome"', async () => {
     // Set fake settings
-    testEnv.setting.changeSetting('configureSettings', {userHome: '${userHome}'});
+    await testEnv.setting.changeSetting('configureSettings', {userHome: '${userHome}'});
 
     // Configure
     expect(await cmt.configure()).to.be.eq(0, '[userHome] configure failed');
@@ -152,7 +152,7 @@ suite('[Variable Substitution]', async () => {
 
   test('Check substitution for variant names', async () => {
     // Set fake settings
-    testEnv.setting.changeSetting('configureSettings', {buildLabel: '${buildLabel}', otherVariant: '${otherVariant}'});
+    await testEnv.setting.changeSetting('configureSettings', {buildLabel: '${buildLabel}', otherVariant: '${otherVariant}'});
 
     // Configure
     expect(await cmt.configure()).to.be.eq(0, '[variant names] configure failed');
@@ -174,7 +174,7 @@ suite('[Variable Substitution]', async () => {
 
   test('Check substitution within "cmake.installPrefix"', async () => {
     // Set fake settings
-    testEnv.setting.changeSetting('installPrefix', '${workspaceRoot}/build/dist');
+    await testEnv.setting.changeSetting('installPrefix', '${workspaceRoot}/build/dist');
 
     // Configure
     expect(await cmt.configure()).to.be.eq(0, '[cmakeInstallPrefix] configure failed');

@@ -8,6 +8,7 @@ import * as ajv from 'ajv';
 import * as https from 'https';
 import * as yaml from 'js-yaml';
 import * as vscode from 'vscode';
+import rollbar from './rollbar';
 
 // tslint:disable:no-console
 
@@ -104,7 +105,9 @@ interface NagState {
 }
 
 
-function writeNagState(ext: vscode.ExtensionContext, state: NagState) { ext.globalState.update('nagState', state); }
+function writeNagState(ext: vscode.ExtensionContext, state: NagState) {
+  return ext.globalState.update('nagState', state);
+}
 
 function getOrInitNagState(ext: vscode.ExtensionContext): NagState {
   const state = ext.globalState.get<NagState>('nagState');
@@ -116,7 +119,7 @@ function getOrInitNagState(ext: vscode.ExtensionContext): NagState {
 
     }
   };
-  writeNagState(ext, init_state);
+  rollbar.takePromise(writeNagState(ext, init_state));
   return init_state;
 }
 
@@ -124,7 +127,7 @@ export class NagManager {
   get onNag() { return this._nagEmitter.event; }
   private readonly _nagEmitter = new vscode.EventEmitter<Nag>();
   private readonly _nagState = getOrInitNagState(this.extensionContext);
-  private _writeNagState() { writeNagState(this.extensionContext, this._nagState); }
+  private _writeNagState() { rollbar.takePromise(writeNagState(this.extensionContext, this._nagState)); }
 
   constructor(readonly extensionContext: vscode.ExtensionContext) {}
 

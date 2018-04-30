@@ -15,7 +15,7 @@ export class DefaultEnvironment {
   kitSelection: SelectKitPickerHandle;
   result: TestProgramResult;
   public vsContext: FakeContextDefinition = new FakeContextDefinition();
-  public wsContext = DirectoryContext.createForDirectory(vscode.workspace.rootPath!, new StateManager(this.vsContext));
+  public wsContext = DirectoryContext.createForDirectory(vscode.workspace.rootPath!, new StateManager(this.vsContext, '__test__'));
   setting: CMakeToolsSettingFile;
   errorMessagesQueue: string[] = [];
 

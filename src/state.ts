@@ -11,49 +11,49 @@ import * as vscode from 'vscode';
  * invalid states.
  */
 export class StateManager {
-  constructor(readonly extensionContext: vscode.ExtensionContext) {}
+  constructor(readonly extensionContext: vscode.ExtensionContext, public readonly subKey: string) {}
 
   /**
    * The name of the workspace-local active kit.
    */
   get activeKitName(): string|null {
-    const kit = this.extensionContext.workspaceState.get<string>('activeKitName');
+    const kit = this.extensionContext.workspaceState.get<string>(`${this.subKey}/activeKitName`);
     return kit || null;
   }
-  set activeKitName(v: string|null) { this.extensionContext.workspaceState.update('activeKitName', v); }
+  setActiveKitName(v: string|null) { return this.extensionContext.workspaceState.update(`${this.subKey}/activeKitName`, v); }
 
   /**
    * The currently select build target
    */
   get defaultBuildTarget(): string|null {
-    const target = this.extensionContext.workspaceState.get<string>('activeBuildTarget');
+    const target = this.extensionContext.workspaceState.get<string>(`${this.subKey}/activeBuildTarget`);
     return target || null;
   }
-  set defaultBuildTarget(s: string|null) { this.extensionContext.workspaceState.update('activeBuildTarget', s); }
+  setDefaultBuildTarget(s: string|null) { return this.extensionContext.workspaceState.update(`${this.subKey}/activeBuildTarget`, s); }
 
   get launchTargetName(): string|null {
-    const name = this.extensionContext.workspaceState.get<string>('launchTargetName');
+    const name = this.extensionContext.workspaceState.get<string>(`${this.subKey}/launchTargetName`);
     return name || null;
   }
-  set launchTargetName(t: string|null) { this.extensionContext.workspaceState.update('launchTargetName', t); }
+  setLaunchTargetName(t: string|null) { return this.extensionContext.workspaceState.update(`${this.subKey}/launchTargetName`, t); }
 
   /**
    * The keyword settings for the build variant
    */
   get activeVariantSettings(): Map<string, string>|null {
-    const pairs = this.extensionContext.workspaceState.get<[string, string][]>('activeVariantSettings');
+    const pairs = this.extensionContext.workspaceState.get<[string, string][]>(`${this.subKey}/activeVariantSettings`);
     if (pairs) {
       return new Map<string, string>(pairs);
     } else {
       return null;
     }
   }
-  set activeVariantSettings(settings: Map<string, string>|null) {
+  setActiveVariantSettings(settings: Map<string, string>|null) {
     if (settings) {
       const pairs: [string, string][] = Array.from(settings.entries());
-      this.extensionContext.workspaceState.update('activeVariantSettings', pairs);
+      return this.extensionContext.workspaceState.update(`${this.subKey}/activeVariantSettings`, pairs);
     } else {
-      this.extensionContext.workspaceState.update('activeVariantSettings', null);
+      return this.extensionContext.workspaceState.update(`${this.subKey}/activeVariantSettings`, null);
     }
   }
 
@@ -61,18 +61,18 @@ export class StateManager {
    * The name of the CMake project for this workspace
    */
   get projectName(): string|null {
-    const name = this.extensionContext.workspaceState.get<string>('projectName');
+    const name = this.extensionContext.workspaceState.get<string>(`${this.subKey}/projectName`);
     return name || null;
   }
-  set projectName(s: string|null) { this.extensionContext.workspaceState.update('projectName', s); }
+  setProjectName(s: string|null) { return this.extensionContext.workspaceState.update(`${this.subKey}/projectName`, s); }
 
   /**
    * Rest all current workspace state. Mostly for troubleshooting
    */
-  reset() {
-    this.activeVariantSettings = null;
-    this.launchTargetName = null;
-    this.defaultBuildTarget = null;
-    this.activeKitName = null;
+  async reset() {
+    await this.setActiveVariantSettings(null);
+    await this.setLaunchTargetName(null);
+    await this.setDefaultBuildTarget(null);
+    await this.setActiveKitName(null);
   }
 }

@@ -11,7 +11,7 @@
 		"await-promise": [true, "Thenable", "PromisedAssertion"],
 		"ban-comma-operator": true,
 		"no-console": [true, "info", "error", "warn"],
-		"no-floating-promises": [true, "PromisedAssertion"],
+		"no-floating-promises": [true, "Thenable", "PromisedAssertion"],
 		/// Errors when we use `tsconfig` "paths" option. Check for a fix in newer TSLint:
 		// "no-implicit-dependencies": [true, "dev"],
 		"no-shadowed-variable": true,

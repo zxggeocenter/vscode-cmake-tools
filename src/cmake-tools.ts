@@ -314,8 +314,8 @@ export class CMakeTools implements vscode.Disposable, api.CMakeToolsAPI {
       cmakePath = '';
     const cmake = await getCMakeExecutableInformation(cmakePath);
     if (!cmake.isPresent) {
-      vscode.window.showErrorMessage(`Bad CMake executable "${
-          cmake.path}". Is it installed or settings contain the correct path (cmake.cmakePath)?`);
+      rollbar.takePromise(vscode.window.showErrorMessage(`Bad CMake executable "${
+          cmake.path}". Is it installed or settings contain the correct path (cmake.cmakePath)?`));
       return null;
     }
 
@@ -452,7 +452,7 @@ export class CMakeTools implements vscode.Disposable, api.CMakeToolsAPI {
     }
     if (!this._kitManager.hasActiveKit) {
       log.debug('No kit selected. Abort configure.');
-      vscode.window.showErrorMessage('Cannot configure without a Kit');
+      rollbar.takePromise(vscode.window.showErrorMessage('Cannot configure without a Kit'));
       return -1;
     }
     if (!this._variantManager.haveVariant) {
@@ -553,7 +553,7 @@ export class CMakeTools implements vscode.Disposable, api.CMakeToolsAPI {
   async editCache(): Promise<void> {
     const drv = await this.getCMakeDriverInstance();
     if (!drv) {
-      vscode.window.showErrorMessage('Set up your CMake project before trying to edit the cache.');
+      rollbar.takePromise(vscode.window.showErrorMessage('Set up your CMake project before trying to edit the cache.'));
       return;
     }
 
@@ -584,7 +584,7 @@ export class CMakeTools implements vscode.Disposable, api.CMakeToolsAPI {
   async showTargetSelector(): Promise<string|null> {
     const drv = await this.getCMakeDriverInstance();
     if (!drv) {
-      vscode.window.showErrorMessage('Set up your CMake project before selecting a target.');
+      rollbar.takePromise(vscode.window.showErrorMessage('Set up your CMake project before selecting a target.'));
       return '';
     }
 
@@ -674,7 +674,7 @@ export class CMakeTools implements vscode.Disposable, api.CMakeToolsAPI {
    */
   public get defaultBuildTarget(): string|null { return this.workspaceContext.state.defaultBuildTarget; }
   private async _setDefaultBuildTarget(v: string) {
-    this.workspaceContext.state.defaultBuildTarget = v;
+    await this.workspaceContext.state.setDefaultBuildTarget(v);
     this._statusBar.targetName = v || await this.allTargetName;
   }
 
@@ -716,7 +716,7 @@ export class CMakeTools implements vscode.Disposable, api.CMakeToolsAPI {
     if (!chosen) {
       return null;
     }
-    this.workspaceContext.state.launchTargetName = chosen.label;
+    await this.workspaceContext.state.setLaunchTargetName(chosen.label);
     this._statusBar.setLaunchTargetName(chosen.label);
     return chosen.detail;
   }
@@ -757,11 +757,11 @@ export class CMakeTools implements vscode.Disposable, api.CMakeToolsAPI {
   async debugTarget(): Promise<vscode.DebugSession|null> {
     const drv = await this.getCMakeDriverInstance();
     if (!drv) {
-      vscode.window.showErrorMessage('Set up and build your CMake project before debugging.');
+      rollbar.takePromise(vscode.window.showErrorMessage('Set up and build your CMake project before debugging.'));
       return null;
     }
     if (drv instanceof LegacyCMakeDriver) {
-      vscode.window
+      const pr = vscode.window
           .showWarningMessage('Target debugging is no longer supported with the legacy driver', {
             title: 'Learn more',
             isLearnMore: true,
@@ -770,7 +770,8 @@ export class CMakeTools implements vscode.Disposable, api.CMakeToolsAPI {
             if (item && item.isLearnMore) {
               open('https://vector-of-bool.github.io/docs/vscode-cmake-tools/debugging.html');
             }
-          });
+        });
+      rollbar.takePromise(pr);
       return null;
     }
     // Ensure that we've configured the project already. If we haven't, `getLaunchTargetPath` won't see any executable
@@ -837,7 +838,7 @@ export class CMakeTools implements vscode.Disposable, api.CMakeToolsAPI {
    */
   public async quickStart(): Promise<Number> {
     if (vscode.workspace.workspaceFolders === undefined) {
-      vscode.window.showErrorMessage('No folder is open.');
+      rollbar.takePromise(vscode.window.showErrorMessage('No folder is open.'));
       return -2;
     }
 
@@ -845,7 +846,7 @@ export class CMakeTools implements vscode.Disposable, api.CMakeToolsAPI {
     const mainListFile = path.join(sourceDir, 'CMakeLists.txt');
 
     if (await fs.exists(mainListFile)) {
-      vscode.window.showErrorMessage('This workspace already contains a CMakeLists.txt!');
+      rollbar.takePromise(vscode.window.showErrorMessage('This workspace already contains a CMakeLists.txt!'));
       return -1;
     }
 
@@ -922,8 +923,8 @@ export class CMakeTools implements vscode.Disposable, api.CMakeToolsAPI {
    * Implementation of `cmake.resetState`
    */
   async resetState() {
-    this.workspaceContext.state.reset();
-    vscode.commands.executeCommand('workbench.action.reloadWindow');
+    await this.workspaceContext.state.reset();
+    await vscode.commands.executeCommand('workbench.action.reloadWindow');
   }
 
   private async _handleCacheEditorMessage(method: string, params: {[key: string]: any}): Promise<any> {

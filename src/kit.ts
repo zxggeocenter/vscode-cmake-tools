@@ -14,6 +14,7 @@ import {loadSchema} from './schema';
 import {StateManager} from './state';
 import {dropNulls, thisExtensionPath} from './util';
 import {MultiWatcher} from './watcher';
+import rollbar from './rollbar';
 
 const log = logging.createLogger('kit');
 
@@ -633,7 +634,7 @@ export async function readKitsFile(filepath: string): Promise<Kit[]> {
         cmakeSettings: item.cmakeSettings,
       };
     } else {
-      vscode.window.showErrorMessage('Your cmake-kits.json file contains one or more invalid entries.');
+      rollbar.takePromise(vscode.window.showErrorMessage('Your cmake-kits.json file contains one or more invalid entries.'));
       return null;
     }
   });
@@ -691,12 +692,12 @@ export class KitManager implements vscode.Disposable {
    * the workspace again.
    * @param kit The new Kit
    */
-  private _setActiveKit(kit: Kit|null) {
+  private async _setActiveKit(kit: Kit|null) {
     log.debug('Active kit set to', kit ? kit.name : 'null');
     if (kit) {
-      this.stateManager.activeKitName = kit.name;
+      await this.stateManager.setActiveKitName(kit.name);
     } else {
-      this.stateManager.activeKitName = null;
+      await this.stateManager.setActiveKitName(null);
     }
     this._activeKit = kit;
     this._activeKitChangedEmitter.fire(kit);
@@ -764,7 +765,7 @@ export class KitManager implements vscode.Disposable {
       return null;
     } else {
       log.debug('User selected kit ', JSON.stringify(chosen));
-      this._setActiveKit(chosen.kit);
+      await this._setActiveKit(chosen.kit);
       return chosen.kit;
     }
   }
@@ -776,7 +777,7 @@ export class KitManager implements vscode.Disposable {
       log.warning('Kit set by name to non-existent kit:', kitName);
       return null;
     } else {
-      this._setActiveKit(chosen);
+      await this._setActiveKit(chosen);
       return chosen;
     }
   }
@@ -841,7 +842,7 @@ export class KitManager implements vscode.Disposable {
     // Set the current kit to the one we have named
     this._kits = kits_acc;
     const already_active_kit = this._kits.find(kit => kit.name === this.stateManager.activeKitName);
-    this._setActiveKit(already_active_kit || null);
+    await this._setActiveKit(already_active_kit || null);
   }
 
   /**
