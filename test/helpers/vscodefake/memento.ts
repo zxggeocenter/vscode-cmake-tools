@@ -12,7 +12,10 @@ export class TestMemento implements vscode.Memento {
       return defaultValue;
     }
   }
-  public update(key: string, value: any): Thenable<void> { return this.storage[key] = value; }
+  public update<T>(key: string, value: T): Thenable<void> {
+    this.storage[key] = value;
+    return Promise.resolve();
+  }
   public containsKey(key: string): boolean { return this.storage.hasOwnProperty(key); }
   public clear() { this.storage = {}; }
 }
