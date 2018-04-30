@@ -55,7 +55,8 @@ suite('Kits test', async () => {
   test('KitManager tests event on change of active kit', async () => {
     const stateMock = sinon.createStubInstance(state.StateManager);
     let storedActivatedKitName: string = '';
-    sinon.stub(stateMock, 'activeKitName').get(() => null).set(kit_ => storedActivatedKitName = kit_);
+    sinon.stub(stateMock, 'activeKitName').get(() => null);
+    stateMock.setActiveKitName = (k: string) => Promise.resolve(storedActivatedKitName = k);
     const km = new kit.KitManager(stateMock, getTestResourceFilePath('test_kit.json'));
     await km.initialize();
     // Check that each time we change the kit, it fires a signal
@@ -108,7 +109,7 @@ suite('Kits test', async () => {
 
   test('KitManager test selection of a default kit', async () => {
     const stateMock = sinon.createStubInstance(state.StateManager);
-    sinon.stub(stateMock, 'activeKitName').get(() => null).set(() => {});
+    sinon.stub(stateMock, 'activeKitName').get(() => null);
 
     const km = new kit.KitManager(stateMock, getTestResourceFilePath('test_kit.json'));
     await km.initialize();
@@ -120,7 +121,8 @@ suite('Kits test', async () => {
   test('KitManager test selection of default kit if last activated kit is invalid', async () => {
     const stateMock = sinon.createStubInstance(state.StateManager);
     let storedActivatedKitName = 'not replaced';
-    sinon.stub(stateMock, 'activeKitName').get(() => 'Unknown').set(kit_ => storedActivatedKitName = kit_);
+    sinon.stub(stateMock, 'activeKitName').get(() => 'Unknwon');
+    stateMock.setActiveKitName = (k: string) => Promise.resolve(storedActivatedKitName = k);
 
     const km = new kit.KitManager(stateMock, getTestResourceFilePath('test_kit.json'));
     await km.initialize();
