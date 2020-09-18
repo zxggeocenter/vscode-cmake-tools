@@ -72,7 +72,7 @@
 	"cmake-tools.configuration.cmake.ctestPath.description": "Chemin de l'exécutable CTest. Si la valeur est null, le chemin est déduit à partir de cmake.cmakePath (il est recommandé de laisser une valeur null).",
 	"cmake-tools.configuration.cmake.ctest.parallelJobs.description": "Nombre de travaux de test parallèles. Utilisez zéro pour utiliser la valeur de cmake.parallelJobs.",
 	"cmake-tools.configuration.cmake.parseBuildDiagnostics.description": "Analyse la sortie du compilateur à la recherche d'avertissements et d'erreurs.",
-	"cmake-tools.configuration.cmake.enabledOutputParsers.description": "Analyseurs de sortie à utiliser. Analyseurs 'cmake', 'gcc', 'gnuld' pris en charge pour les sorties d'éditeurs de liens de style GNULD, 'msvc' pour Microsoft Visual C++ et 'ghs' pour le compilateur Green Hills avec --no_wrap_diagnostics --brief_diagnostics.",
+	"cmake-tools.configuration.cmake.enabledOutputParsers.description": "Output parsers to use. Supported parsers 'cmake', 'gcc', 'gnuld' for GNULD-style linker output, 'msvc' for Microsoft Visual C++, 'ghs' for the Green Hills compiler with --no_wrap_diagnostics --brief_diagnostics, and 'diab' for the Wind River Diab compiler.",
 	"cmake-tools.configuration.cmake.debugConfig.description": "Configuration Debug à utiliser au moment du débogage d'une cible.",
 	"cmake-tools.configuration.cmake.debugConfig.symbolSearchPath.description": "Chemins de recherche des symboles du débogueur Visual Studio.",
 	"cmake-tools.configuration.cmake.debugConfig.additionalSOLibSearchPath.description": "Chemins de GDB ou LLDB pour la recherche de fichiers .so.",
